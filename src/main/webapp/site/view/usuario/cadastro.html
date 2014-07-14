@@ -1,0 +1,19 @@
+<html>
+	<form role="form">
+		<div class="form-group">
+	    	<label for="inputEmail">Email</label>
+	    	<input type="text" class="form-control" id="inputEmail" placeholder="Email" ng-model="currentUsuario.email">
+	  	</div>
+	  	<div class="form-group">
+	    	<label for="inputLogin">Login</label>
+	    	<input type="text" class="form-control" id="inputLogin" placeholder="Login" ng-model="currentUsuario.username">
+	  	</div>
+	  	<div class="form-group">
+	    	<label for="inputSenha">Senha</label>
+	    	<input type="text" class="form-control" id="inputSenha" placeholder="Login" ng-model="currentUsuario.password">
+	  	</div>
+	  
+	  	<button type="button" class="btn btn-default" ng-click="insert()">Enviar</button>
+	  	<button type="button" class="btn btn-default" ui-sref="usuario">Cancelar</button>
+	</form>
+</html>

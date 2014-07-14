@@ -1,0 +1,36 @@
+<html>
+	<!-- Listar -->
+	<div class="btn-toolbar" ng-if="currentState == 'post'">
+		<button class="btn btn-primary" ui-sref="post.insert">
+			<span>Novo post</span>
+		</button>
+	</div>
+	
+	<!-- Cadastro de post -->
+	<div class="btn-toolbar" ng-if="currentState == 'post.insert'">
+		<button type="button" class="btn navbar-btn btn-primary"
+			ng-click="insert()">
+			<span>Salvar</span>
+		</button>
+		<button class="btn btn-primary" ui-sref="post">
+			<span>Cancelar</span>
+		</button>
+	</div>
+	
+	<!-- Cadastro de post -->
+	<div class="btn-toolbar" ng-if="currentState == 'post.edit'">
+		<button type="button" class="btn navbar-btn btn-primary"
+			ng-click="update()">
+			<span>Salvar</span>
+		</button>
+		<button class="btn btn-primary" ui-sref="post">
+			<span>Cancelar</span>
+		</button>
+	</div>
+	
+	<br/>
+	<div>
+		<div ng-include="'site/view/post/post-list.html'" ng-if="currentState == 'post'"></div>
+		<div ng-include="'site/view/post/post-form.html'" ng-if="currentState == 'post.insert' || currentState == 'post.edit'"></div>
+	</div>	
+</html>

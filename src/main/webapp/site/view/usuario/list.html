@@ -1,0 +1,30 @@
+<html>
+	<div class="panel panel-default">
+  		<!-- Default panel contents -->
+		<div class="panel-heading">Lista de Usuarios
+			<button class="btn btn-primary" ui-sref="usuario.insert">
+				<span>Novo</span>
+			</button>
+		</div>
+		
+		<!-- Table -->
+		<table class="table">
+			<thead>
+				<tr>
+             		<th>#</th>
+	              	<th>Email</th>
+	              	<th>Login</th>
+	              	<th>Role</th>
+            	</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="usuario in usuarios">
+					<td>{{usuario.id}}</td>
+					<td>{{usuario.email}}</td>
+					<td>{{usuario.username}}</td>
+					<td>{{usuario.role}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</html>

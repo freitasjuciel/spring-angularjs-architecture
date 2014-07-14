@@ -1,0 +1,102 @@
+﻿﻿<!DOCTYPE html>
+<html ng-app="jees-authentication" xmlns:ng="http://angularjs.org">
+<head>
+	<title>JESS - Login</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+	<link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap-theme.min.css"/>
+    
+    <style type="text/css">
+    	body{
+    		background-color: #eee;
+    	}
+    	
+    	.form-signin .form-control:focus {
+			z-index: 2;
+			position: relative;
+		}
+		
+    </style>
+</head>
+
+<body>
+    <!-- login content -->
+    <div class="container" 
+    	ng-controller="AutenticacaoController">
+
+		<div class="alert alert-danger alert-dismissable" ng-show="message != null">
+		  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+		  <strong>Erro =/</strong> - {{message}}
+		</div>
+		
+		<form novalidate class="form-signin" 
+			name="formLogin"
+        	ng-submit="autenticar(user)"
+        	style="max-width: 330px; padding: 40px 15px 15px 15px; margin: 0 auto">
+        	
+	        <h2 class="form-signin-heading">Por favor, faça o login</h2>
+	        
+	        <input type="text" class="form-control" 
+	        	placeholder="Login"
+	        	ng-model="user.username" 
+	        	ng-required="true"
+	        	style="margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0">
+	        <input type="password" class="form-control" 
+	        	placeholder="Senha"
+	        	ng-model="user.password" 
+	        	ng-required="true"
+	        	style="margin-bottom: 10px; border-top-left-radius: 0; border-top-right-radius: 0;">
+	        <br/>
+	        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      	</form>
+      	
+    </div> 
+
+	<!-- JQuery -->
+	<script type="text/javascript" src="static/js/jquery.min.js"></script>
+	<!-- Angular -->
+	<script type="text/javascript" src="static/js/angular.min.js"></script>
+	<script type="text/javascript" src="static/js/ui-router.min.js"></script>
+	<!-- Bootstrap -->
+	<script type="text/javascript" src="static/bootstrap/js/bootstrap.min.js"></script>
+	
+	<!--
+		Controllers
+	-->
+	<script type="text/javascript">
+
+		angular.module("jees-authentication", [])
+
+		function AutenticacaoController( $scope, $log, $location, $http ) {
+
+			$scope.user = {};
+			$scope.message = null;
+			
+            /*-------------------------------------------------------------------
+             * 		 				 	  BEHAVIORS
+             *-------------------------------------------------------------------*/
+			/**
+			 * Funcao que autentica o usuario
+			 */
+			$scope.autenticar = function( user ) {
+
+				var config = {
+					headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
+				};
+				
+				$http.post( "j_spring_security_check", $.param( user ), config).
+					success(function(data, status, headers, config) {
+                          window.location = "./";
+					}).
+					error(function(data, status, headers, config) {
+						console.log(data);
+						console.log(headers);
+						$scope.message = data;
+					});
+			};
+        }
+	</script>
+</body>
+</html>

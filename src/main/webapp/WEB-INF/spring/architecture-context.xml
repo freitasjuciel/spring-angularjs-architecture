@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:data="http://www.springframework.org/schema/data/jpa"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+						http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<context:property-placeholder ignore-unresolvable="false"
+		location="classpath:architecture.properties"/>
+	
+	<!-- ========================== DATA SOURCE ============================= -->
+	<!-- DataSource configuration for Apache Commons DBCP. -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" 
+		destroy-method="close" p:defaultAutoCommit="false" 
+		p:driverClassName="${jdbc.driverClassName}" p:url="${jdbc.url}"
+		p:username="${jdbc.username}" p:password="${jdbc.password}" />
+		
+	<!-- ============================== JPA CONFIG ================================  -->
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+	    p:dataSource-ref="dataSource">
+	   	<property name="loadTimeWeaver">
+            <bean class="org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver" />
+        </property>
+        <property name="persistenceProviderClass" value="org.hibernate.ejb.HibernatePersistence"/>
+        <property name="persistenceUnitName" value="${jpa.persistenceUnitName}"/>
+		<property name="packagesToScan" value="br.edu.utfpr.md.architecture.model.entity"/>
+	    <property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+				p:databasePlatform="${jpa.databasePlatform}"/>
+		</property>
+		<property name="jpaProperties">
+      		<props>
+      			<!-- General -->
+      			<prop key="hibernate.hbm2ddl.auto">${jpa.generateDdl}</prop>
+      			<prop key="hibernate.format_sql">false</prop>
+      			<prop key="hibernate.show_sql">${jpa.showSql}</prop>
+				<!-- Scan for annotated classes and Hibernate in this classpath -->
+      			<prop key="hibernate.archive.autodetection">class</prop>
+				
+	  			<!-- Pool -->
+				<prop key="hibernate.c3p0.minPoolSize">5</prop>
+				<prop key="hibernate.c3p0.maxPoolSize">20</prop>
+				<prop key="hibernate.c3p0.timeout">1800</prop>
+				<prop key="hibernate.c3p0.max_statement">50</prop>
+				<prop key="hibernate.c3p0.testConnectionOnCheckout">true</prop>
+      		</props>
+    	</property>
+	</bean>
+	<bean id="entityManager" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+   	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+     	<property name="entityManagerFactory" ref="entityManagerFactory" />
+   	</bean>		
+   	
+   	<!--
+		Instruct Spring to perform declarative transaction management
+		automatically on annotated classes.
+	-->
+	<tx:annotation-driven transaction-manager="transactionManager" mode="aspectj"/>
+	
+	<!--
+		Activates various annotations to be detected in bean classes: Spring's
+		@Required and @Autowired, as well as JSR 250's @PostConstruct,
+		@PreDestroy and @Resouce (if available) and JPA's @PersistenceContext
+		and @PersistenceUnit (if available).
+	-->
+	<context:annotation-config />
+	
+	<!-- Service beans -->
+	<context:component-scan base-package="br.edu.utfpr.md.architecture.model.service" />
+	
+	<!-- Repositorie beans -->
+	<data:repositories base-package="br.edu.utfpr.md.architecture.model.repository"/>
+		
+	<!-- Bootstrap -->
+	<bean id="initializeBootstrap" class="br.edu.utfpr.md.architecture.infrastructure.system.InitializeBootstrap"/>
+	
+	<!-- ============================== MAIL ================================  -->
+	
+	<context:component-scan base-package="br.edu.utfpr.md.architecture.infrastructure.mail" />
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="protocol" value="${mail.protocol}"/>
+		<property name="host" value="${mail.host}"/>
+		<property name="port" value="${mail.port}"/>
+		<property name="username" value="${mail.user}"/>
+		<property name="password" value="${mail.password}"/>
+  		<property name="javaMailProperties">
+  			<props>
+  				<prop key="mail.smtp.starttls.enable">${mail.tls}</prop>
+  				<prop key="mail.smtp.ssl.enable">${mail.ssl}</prop>
+  				<prop key="mail.smtps.debug">${mail.debug}</prop>
+  				<prop key="mail.smtp.debug">${mail.debug}</prop>
+  				<prop key="mail.debug">${mail.debug}</prop>
+  			</props>
+  		</property>
+	</bean>
+	
+	<!-- Velocity Template -->
+    <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+      <property name="velocityProperties">
+         <value>
+            resource.loader=class
+            class.resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+         </value>
+      </property>
+    </bean>
+</beans>
